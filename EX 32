@@ -1,0 +1,43 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
+
+int dsa_sign(int message, int p, int q, int g, int x) {
+    int k = rand() % (q - 1) + 1;   // random per signature
+    int r = (g * k) % q;
+    int s = (k + x * message) % q;
+    return r + s;   // simplified signature
+}
+
+int rsa_sign(int message, int d, int n) {
+    int result = 1;
+    for (int i = 0; i < d; i++)
+        result = (result * message) % n;
+    return result;
+}
+
+int main() {
+    srand(time(NULL));
+
+    int message = 12;
+
+    // DSA parameters (simplified)
+    int p = 23, q = 11, g = 2, x = 5;
+
+    int dsa_sig1 = dsa_sign(message, p, q, g, x);
+    int dsa_sig2 = dsa_sign(message, p, q, g, x);
+
+    printf("DSA Signature 1: %d\n", dsa_sig1);
+    printf("DSA Signature 2: %d\n", dsa_sig2);
+
+    // RSA parameters (simplified)
+    int d = 7, n = 33;
+
+    int rsa_sig1 = rsa_sign(message, d, n);
+    int rsa_sig2 = rsa_sign(message, d, n);
+
+    printf("RSA Signature 1: %d\n", rsa_sig1);
+    printf("RSA Signature 2: %d\n", rsa_sig2);
+
+    return 0;
+}
