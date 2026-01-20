@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+
+#define BLOCK 8
+
+void pad(unsigned char *data, int *len) {
+    data[*len] = 0x80;   // 1 followed by zeros
+    (*len)++;
+    while (*len % BLOCK != 0) {
+        data[*len] = 0x00;
+        (*len)++;
+    }
+}
+
+void ecb(unsigned char *pt, unsigned char *ct, unsigned char *key, int len) {
+    for (int i = 0; i < len; i++)
+        ct[i] = pt[i] ^ key[i % BLOCK];
+}
+
+void cbc(unsigned char *pt, unsigned char *ct, unsigned char *key,
+         unsigned char *iv, int len) {
+    unsigned char prev[BLOCK];
+    memcpy(prev, iv, BLOCK);
+
+    for (int i = 0; i < len; i++) {
+        ct[i] = pt[i] ^ prev[i % BLOCK] ^ key[i % BLOCK];
+        prev[i % BLOCK] = ct[i];
+    }
+}
+
+void cfb(unsigned char *pt, unsigned char *ct, unsigned char *key,
+         unsigned char *iv, int len) {
+    unsigned char prev[BLOCK];
+    memcpy(prev, iv, BLOCK);
+
+    for (int i = 0; i < len; i++) {
+        unsigned char stream = prev[i % BLOCK] ^ key[i % BLOCK];
+        ct[i] = pt[i] ^ stream;
+        prev[i % BLOCK] = ct[i];
+    }
+}
+
+int main() {
+    unsigned char key[BLOCK] = "ABCDEFGH";
+    unsigned char iv[BLOCK]  = "12345678";
+
+    unsigned char plaintext[64] = "HELLODES";
+    int len = strlen((char *)plaintext);
+
+    pad(plaintext, &len);
+
+    unsigned char ecb_ct[64], cbc_ct[64], cfb_ct[64];
+
+    ecb(plaintext, ecb_ct, key, len);
+    cbc(plaintext, cbc_ct, key, iv, len);
+    cfb(plaintext, cfb_ct, key, iv, len);
+
+    printf("ECB Ciphertext: ");
+    for (int i = 0; i < len; i++) printf("%02X ", ecb_ct[i]);
+
+    printf("\nCBC Ciphertext: ");
+    for (int i = 0; i < len; i++) printf("%02X ", cbc_ct[i]);
+
+    printf("\nCFB Ciphertext: ");
+    for (int i = 0; i < len; i++) printf("%02X ", cfb_ct[i]);
+
+    return 0;
+}
