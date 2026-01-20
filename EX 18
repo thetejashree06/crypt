@@ -1,0 +1,35 @@
+from Crypto.Cipher import DES
+from Crypto.Random import get_random_bytes
+
+def pad_message(message, block_size):
+    """Pads the message using '1' followed by '0's up to the next block size."""
+    padding_length = block_size - (len(message) % block_size)
+    if padding_length == 0:
+        padding_length = block_size  
+    padding = b'\x80' + b'\x00' * (padding_length - 1)
+    return message + padding
+
+def des_encrypt(plaintext, key):
+    """Encrypts using DES in ECB mode (for simplicity)."""
+    cipher = DES.new(key, DES.MODE_ECB)
+    padded_text = pad_message(plaintext, DES.block_size)
+    return cipher.encrypt(padded_text)
+
+def des_decrypt(ciphertext, key):
+    """Decrypts using DES with keys applied in reverse order."""
+    cipher = DES.new(key, DES.MODE_ECB)
+    decrypted_text = cipher.decrypt(ciphertext)
+    return decrypted_text.rstrip(b'\x80\x00')  
+
+
+key = get_random_bytes(8)
+
+plaintext = b"SecretMsg"  
+
+
+ciphertext = des_encrypt(plaintext, key)
+print("Encrypted:", ciphertext.hex())
+
+
+decrypted_text = des_decrypt(ciphertext, key)
+print("Decrypted:", decrypted_text.decode())
