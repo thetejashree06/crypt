@@ -1,0 +1,26 @@
+#include <stdio.h>
+int gcd(int a, int b) {
+    while (b != 0) {
+        int t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+int main() {
+    int n = 3599;          // n = p * q
+    int m = 118;           // plaintext block sharing factor with n
+
+    int factor = gcd(m, n);
+
+    if (factor > 1 && factor < n) {
+        printf("Common factor found: %d\n", factor);
+        printf("Other factor: %d\n", n / factor);
+        printf("RSA is broken.\n");
+    } else {
+        printf("No useful information gained.\n");
+    }
+
+    return 0;
+}
