@@ -1,0 +1,68 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
+#define MAX 1000
+#define ALPHABET 26
+
+char english_freq[] = "ETAOINSHRDLCUMWFGYPBVKJXQZ";
+
+typedef struct {
+    char text[MAX];
+    int score;
+} Candidate;
+
+int compare(const void *a, const void *b) {
+    return ((Candidate *)b)->score - ((Candidate *)a)->score;
+}
+
+void frequency_attack(char *cipher, int topN) {
+    int freq[ALPHABET] = {0};
+    int len = strlen(cipher);
+
+    for (int i = 0; i < len; i++)
+        if (cipher[i] >= 'A' && cipher[i] <= 'Z')
+            freq[cipher[i] - 'A']++;
+
+    int index[ALPHABET];
+    for (int i = 0; i < ALPHABET; i++)
+        index[i] = i;
+
+    for (int i = 0; i < ALPHABET - 1; i++)
+        for (int j = i + 1; j < ALPHABET; j++)
+            if (freq[index[j]] > freq[index[i]]) {
+                int t = index[i];
+                index[i] = index[j];
+                index[j] = t;
+            }
+
+    Candidate results[ALPHABET];
+
+    for (int shift = 0; shift < ALPHABET; shift++) {
+        char map[ALPHABET];
+        for (int i = 0; i < ALPHABET; i++)
+            map[index[i]] = english_freq[(i + shift) % ALPHABET];
+
+        for (int i = 0; i < len; i++) {
+            if (cipher[i] >= 'A' && cipher[i] <= 'Z')
+                results[shift].text[i] = map[cipher[i] - 'A'];
+            else
+                results[shift].text[i] = cipher[i];
+        }
+        results[shift].text[len] = '\0';
+        results[shift].score = 26 - shift;
+    }
+
+    qsort(results, ALPHABET, sizeof(Candidate), compare);
+
+    printf("\nTop %d possible plaintexts:\n\n", topN);
+    for (int i = 0; i < topN && i < ALPHABET; i++)
+        printf("%2d: %s\n", i + 1, results[i].text);
+}
+
+int main() {
+    char ciphertext[MAX] = "WKLV LV D PRQRDOSKDEHWLF VXEVWLWXWLRQ FLSKHU";
+    int topN = 10;
+
+    frequency_attack(ciphertext, topN);
+    return 0;
