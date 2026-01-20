@@ -1,0 +1,12 @@
+#include <stdio.h>
+
+int main() {
+    int n = 3599;
+    int d = 3031;
+
+    printf("Private key leaked: d = %d\n", d);
+    printf("Modulus n = %d\n", n);
+    printf("Keeping the same n is NOT secure.\n");
+    printf("Attacker can factor n and break all future keys.\n");
+
+    return 0;
