@@ -1,0 +1,40 @@
+#include <stdio.h>
+#include <string.h>
+
+#define BLOCK_SIZE 16   // 128 bits
+#define Rb 0x87         // constant for 128-bit block
+
+void leftShift(unsigned char *out, unsigned char *in) {
+    unsigned char carry = 0, nextCarry;
+    for (int i = BLOCK_SIZE - 1; i >= 0; i--) {
+        nextCarry = (in[i] & 0x80) ? 1 : 0;
+        out[i] = (in[i] << 1) | carry;
+        carry = nextCarry;
+    }
+}
+void generateSubkey(unsigned char *k1, unsigned char *k2, unsigned char *L) {
+    leftShift(k1, L);
+    if (L[0] & 0x80)
+        k1[BLOCK_SIZE - 1] ^= Rb;
+
+    leftShift(k2, k1);
+    if (k1[0] & 0x80)
+        k2[BLOCK_SIZE - 1] ^= Rb;
+}
+
+int main() {
+    unsigned char L[BLOCK_SIZE] = {0};   // assume E_K(0^n)
+    unsigned char K1[BLOCK_SIZE], K2[BLOCK_SIZE];
+
+    generateSubkey(K1, K2, L);
+
+    printf("K1: ");
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        printf("%02X ", K1[i]);
+
+    printf("\nK2: ");
+    for (int i = 0; i < BLOCK_SIZE; i++)
+        printf("%02X ", K2[i]);
+
+    return 0;
+}
