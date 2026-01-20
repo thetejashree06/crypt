@@ -1,0 +1,36 @@
+#include <stdio.h>
+
+int main() {
+    int rate_lanes = 16;     // 1024 / 64
+    int capacity_lanes = 9;  // 576 / 64
+
+    int rate[16];
+    int capacity[9];
+
+    for (int i = 0; i < rate_lanes; i++)
+        rate[i] = 1;   // at least one non-zero bit
+
+    for (int i = 0; i < capacity_lanes; i++)
+        capacity[i] = 0;  // initially zero
+
+    for (int block = 1; block <= 1000; block++) {
+        for (int i = 0; i < rate_lanes; i++)
+            rate[i] ^= 1;   // absorb message (example)
+
+        int allNonZero = 1;
+        for (int i = 0; i < capacity_lanes; i++) {
+            if (capacity[i] == 0) {
+                allNonZero = 0;
+                break;
+            }
+        }
+
+        if (allNonZero) {
+            printf("All capacity lanes non-zero after %d blocks\n", block);
+            return 0;
+        }
+    }
+
+    printf("Capacity lanes never become non-zero (permutation ignored)\n");
+    return 0;
+}
