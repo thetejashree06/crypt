@@ -1,0 +1,18 @@
+import random
+def diffie_hellman(p, g):
+    a = random.randint(2, p-2)  
+    b = random.randint(2, p-2) 
+    A = pow(g, a, p)  
+    B = pow(g, b, p)
+      shared_secret_alice = pow(B, a, p)
+    shared_secret_bob = pow(A, b, p)
+        return a, b, A, B, shared_secret_alice, shared_secret_bob
+p = 23  # A prime number (public)
+g = 5   # A primitive root modulo p (public)
+a, b, A, B, shared_secret_alice, shared_secret_bob = diffie_hellman(p, g)
+print(f"Alice's Private Key: {a}")
+print(f"Bob's Private Key: {b}")
+print(f"Alice's Public Key: {A}")
+print(f"Bob's Public Key: {B}")
+print(f"Shared Secret Computed by Alice: {shared_secret_alice}")
+print(f"Shared Secret Computed by Bob: {shared_secret_bob}")
