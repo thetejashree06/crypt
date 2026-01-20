@@ -1,0 +1,20 @@
+#include <stdio.h>
+
+unsigned char E(unsigned char k, unsigned char x) {
+    return x ^ k;   // simple XOR-based "cipher" for demo
+}
+
+int main() {
+    unsigned char K = 0x0F;
+    unsigned char X = 0x55;
+
+    unsigned char T = E(K, X);
+
+    unsigned char C1 = E(K, X);
+    unsigned char C2 = E(K, X ^ T ^ C1);
+
+    printf("MAC(K, X) = 0x%X\n", T);
+    printf("MAC(K, X || (X XOR T)) = 0x%X\n", C2);
+
+    return 0;
+}
