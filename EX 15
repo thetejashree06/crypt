@@ -1,0 +1,52 @@
+def binary_to_decimal(binary_str):
+    return int(binary_str, 2)
+
+def decimal_to_binary(decimal, length=8):
+    return format(decimal, f'0{length}b')
+
+def xor(bin_str1, bin_str2):
+    return ''.join('0' if b1 == b2 else '1' for b1, b2 in zip(bin_str1, bin_str2))
+
+def sdes_encrypt_block(plain_block, key):
+    return xor(plain_block, key[:len(plain_block)])
+
+def sdes_decrypt_block(cipher_block, key):
+    return xor(cipher_block, key[:len(cipher_block)])
+
+def cbc_encrypt(plaintext_bin, key_bin, iv_bin):
+    block_size = len(iv_bin)
+    ciphertext_bin = ""
+    prev_block = iv_bin
+    
+    for i in range(0, len(plaintext_bin), block_size):
+        block = plaintext_bin[i:i + block_size].ljust(block_size, '0')
+        xored_block = xor(block, prev_block)
+        encrypted_block = sdes_encrypt_block(xored_block, key_bin)
+        ciphertext_bin += encrypted_block
+        prev_block = encrypted_block
+    
+    return ciphertext_bin
+
+def cbc_decrypt(ciphertext_bin, key_bin, iv_bin):
+    block_size = len(iv_bin)
+    plaintext_bin = ""
+    prev_block = iv_bin
+    
+    for i in range(0, len(ciphertext_bin), block_size):
+        block = ciphertext_bin[i:i + block_size]
+        decrypted_block = sdes_decrypt_block(block, key_bin)
+        xored_block = xor(decrypted_block, prev_block)
+        plaintext_bin += xored_block
+        prev_block = block
+    
+    return plaintext_bin
+
+plaintext_bin = "0000000100100011"
+key_bin = "0111111101".ljust(16, '0') 
+iv_bin = "10101010".ljust(16, '0') 
+
+ciphertext_bin = cbc_encrypt(plaintext_bin, key_bin, iv_bin)
+decrypted_bin = cbc_decrypt(ciphertext_bin, key_bin, iv_bin)
+
+print (f"Ciphertext: {ciphertext_bin}")
+print(f"Decrypted Plaintext: {decrypted_bin}")
