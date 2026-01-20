@@ -1,0 +1,33 @@
+import math
+def factorize_n(n):
+    for p in range(2, int(math.sqrt(n)) + 1):
+        if n % p == 0:
+            q = n // p
+            return p, q
+    return None, None
+
+def extended_gcd(a, b):
+    if a == 0:
+        return b, 0, 1
+    gcd, x1, y1 = extended_gcd(b % a, a)
+    x = y1 - (b // a) * x1
+    y = x1
+    return gcd, x, y
+
+def modular_inverse(e, phi):
+    gcd, x, y = extended_gcd(e, phi)
+    if gcd != 1:
+        return None  # No modular inverse exists
+    return x % phi
+
+def rsa_private_key(e, n):
+    p, q = factorize_n(n)
+    if not p or not q:
+        return "Factorization failed"
+    phi_n = (p - 1) * (q - 1)
+    d = modular_inverse(e, phi_n)
+    return d
+e = 31
+n = 3599
+d = rsa_private_key(e, n)
+print("Private key (d):", d)
