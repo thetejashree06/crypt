@@ -1,0 +1,46 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define MAX_LEN 100
+void frequencyAnalysis(char *ciphertext) {
+    int freq[26] = {0};
+    int i, maxIndex = 0, secondMaxIndex = 0, thirdMaxIndex = 0;
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            freq[ciphertext[i] - 'A']++;
+        }
+    }
+    for (i = 1; i < 26; i++) {
+        if (freq[i] > freq[maxIndex]) {
+            thirdMaxIndex = secondMaxIndex;
+            secondMaxIndex = maxIndex;
+            maxIndex = i;
+        } else if (freq[i] > freq[secondMaxIndex]) {
+            thirdMaxIndex = secondMaxIndex;
+            secondMaxIndex = i;
+        } else if (freq[i] > freq[thirdMaxIndex]) {
+            thirdMaxIndex = i;
+        }
+    }
+    printf("Most frequent letters: %c, %c, %c (likely mapping to E, T, H)\n", maxIndex + 'A', secondMaxIndex + 'A', thirdMaxIndex + 'A');
+}
+void decryptUsingSubstitution(char *ciphertext, char *decryptedText, char map[26]) {
+    int i;
+    for (i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            decryptedText[i] = map[ciphertext[i] - 'A'];
+        } else {
+            decryptedText[i] = ciphertext[i];
+        }
+    }
+    decryptedText[i] = '\0';
+}
+int main() {
+    char ciphertext[MAX_LEN] = "GUVF VF N FRPERG ZRFFNTR"; // Example cipher text
+    char decryptedText[MAX_LEN];
+    char substitutionMap[26] = {'T', 'H', 'E', 'A', 'O', 'N', 'I', 'S', 'R', 'D', 'L', 'C', 'U', 'M', 'W', 'F', 'G', 'Y', 'P', 'B', 'V', 'K', 'J', 'X', 'Q', 'Z'};
+    frequencyAnalysis(ciphertext);
+    decryptUsingSubstitution(ciphertext, decryptedText, substitutionMap);
+    printf("Decrypted Text: %s\n", decryptedText);
+    return 0;
+}
