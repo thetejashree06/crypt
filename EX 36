@@ -1,0 +1,40 @@
+ #include <stdio.h>
+
+int gcd(int a, int b) {
+    while (b != 0) {
+        int t = b;
+        b = a % b;
+        a = t;
+    }
+    return a;
+}
+
+char encrypt(char p, int a, int b) {
+    return ((a * (p - 'A') + b) % 26) + 'A';
+}
+
+int main() {
+    int a = 2, b = 3;          // change 'a' to test
+    char text[] = "AN";
+    int map[26] = {0};
+
+    if (gcd(a, 26) != 1) {
+        printf("Key is NOT one-to-one (invalid a = %d)\n\n", a);
+    } else {
+        printf("Key is one-to-one (valid a = %d)\n\n", a);
+    }
+
+    for (int i = 0; i < 26; i++) {
+        char c = encrypt('A' + i, a, b);
+        map[c - 'A']++;
+        printf("E(%2d) = %c\n", i, c);
+    }
+
+    printf("\nCollisions:\n");
+    for (int i = 0; i < 26; i++) {
+        if (map[i] > 1)
+            printf("Cipher %c occurs %d times\n", 'A' + i, map[i]);
+    }
+
+    return 0;
+}
