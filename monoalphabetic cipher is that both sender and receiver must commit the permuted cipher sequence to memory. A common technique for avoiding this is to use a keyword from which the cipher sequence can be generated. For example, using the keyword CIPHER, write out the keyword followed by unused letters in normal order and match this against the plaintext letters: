@@ -1,0 +1,64 @@
+#include <stdio.h>
+#include <string.h>
+#include <ctype.h>
+#define ALPHABET_SIZE 26
+void generateCipherAlphabet(char *keyword, char *cipherAlphabet) {
+    int used[ALPHABET_SIZE] = {0};
+    int i, j = 0, len = strlen(keyword);
+    for (i = 0; i < len; i++) {
+        if (!used[keyword[i] - 'A']) {
+            cipherAlphabet[j++] = keyword[i];
+            used[keyword[i] - 'A'] = 1;
+        }
+    }
+    for (i = 0; i < ALPHABET_SIZE; i++) {
+        if (!used[i]) {
+            cipherAlphabet[j++] = 'A' + i;
+        }
+    }
+    cipherAlphabet[j] = '\0';
+}
+
+void monoalphabeticEncrypt(char *plaintext, char *cipherAlphabet, char *ciphertext) {
+    for (int i = 0; plaintext[i] != '\0'; i++) {
+        if (isalpha(plaintext[i])) {
+            ciphertext[i] = cipherAlphabet[toupper(plaintext[i]) - 'A'];
+        } else {
+            ciphertext[i] = plaintext[i];
+        }
+    }
+    ciphertext[strlen(plaintext)] = '\0';
+}
+
+void monoalphabeticDecrypt(char *ciphertext, char *cipherAlphabet, char *decryptedText) {
+    for (int i = 0; ciphertext[i] != '\0'; i++) {
+        if (isalpha(ciphertext[i])) {
+            for (int j = 0; j < ALPHABET_SIZE; j++) {
+                if (cipherAlphabet[j] == ciphertext[i]) {
+                    decryptedText[i] = 'A' + j;
+                    break;
+                }
+            }
+        } else {
+            decryptedText[i] = ciphertext[i];
+        }
+    }
+    decryptedText[strlen(ciphertext)] = '\0';
+}
+
+int main() {
+    char keyword[] = "CIPHER";
+    char cipherAlphabet[ALPHABET_SIZE + 1];
+    char plaintext[] = "MEET ME AT THE USUAL PLACE AT TEN RATHER THAN EIGHT OCLOCK";
+    char ciphertext[100], decryptedText[100];
+    
+    generateCipherAlphabet(keyword, cipherAlphabet);
+    monoalphabeticEncrypt(plaintext, cipherAlphabet, ciphertext);
+    monoalphabeticDecrypt(ciphertext, cipherAlphabet, decryptedText);
+    
+    printf("Cipher Alphabet: %s\n", cipherAlphabet);
+    printf("Ciphertext: %s\n", ciphertext);
+    printf("Decrypted Text: %s\n", decryptedText);
+    
+    return 0;
+}
