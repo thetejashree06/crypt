@@ -1,0 +1,26 @@
+def mi(n, mod):
+    for i in range(1, mod):
+        if (n * i) % mod == 1:
+            return i
+    return -1
+
+def rk(pt, ct, mod=26):
+    d = (pt[0][0] * pt[1][1] - pt[0][1] * pt[1][0]) % mod
+    di = mi(d, mod)  
+    
+    if di == -1:
+        raise ValueError("Matrix is not invertible under the given modulus")
+    
+    pi = [[pt[1][1] * di % mod, -pt[0][1] * di % mod],
+          [-pt[1][0] * di % mod, pt[0][0] * di % mod]] 
+    
+    k = [[sum(a * b for a, b in zip(row, col)) % mod for col in zip(*pi)] for row in ct]
+    return k
+
+pt = [[7, 8], [4, 19]]
+ct = [[19, 3], [4, 21]]
+km = rk(pt, ct)
+
+print("Recovered Key Matrix:")
+for row in km:
+    print(row)
