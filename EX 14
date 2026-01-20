@@ -1,0 +1,39 @@
+from Crypto.Cipher import AES
+from Crypto.Random import get_random_bytes
+
+def pad_message(message, block_size):
+    """Pads the message using '1' followed by '0's up to the next block size."""
+    padding_length = block_size - (len(message) % block_size)
+    if padding_length == 0:
+        padding_length = block_size  
+    padding = b'\x80' + b'\x00' * (padding_length - 1)
+    return message + padding
+
+def ecb_encrypt(plaintext, key):
+    cipher = AES.new(key, AES.MODE_ECB)
+    padded_text = pad_message(plaintext, AES.block_size)
+    return cipher.encrypt(padded_text)
+
+def cbc_encrypt(plaintext, key, iv):
+    cipher = AES.new(key, AES.MODE_CBC, iv)
+    padded_text = pad_message(plaintext, AES.block_size)
+    return cipher.encrypt(padded_text)
+
+def cfb_encrypt(plaintext, key, iv, segment_size=8):
+    cipher = AES.new(key, AES.MODE_CFB, iv, segment_size=segment_size)
+    return cipher.encrypt(plaintext)  
+
+
+key = get_random_bytes(16)  
+iv = get_random_bytes(16)  
+plaintext = b"ConfidentialData123"  
+
+
+ciphertext_ecb = ecb_encrypt(plaintext, key)
+ciphertext_cbc = cbc_encrypt(plaintext, key, iv)
+ciphertext_cfb = cfb_encrypt(plaintext, key, iv)
+
+
+print("ECB Encrypted:", ciphertext_ecb.hex())
+print("CBC Encrypted:", ciphertext_cbc.hex())
+print("CFB Encrypted:", ciphertext_cfb.hex())
