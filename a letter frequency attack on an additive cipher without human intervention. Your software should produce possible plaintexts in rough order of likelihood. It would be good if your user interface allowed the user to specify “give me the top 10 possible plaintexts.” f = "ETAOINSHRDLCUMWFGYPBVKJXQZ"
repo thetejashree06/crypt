@@ -1,0 +1,12 @@
+def decr(ct, k):
+    return "".join(chr(((ord(c) - 65 - k) % 26) + 65) if c.isalpha() else c for c in ct)
+
+def score(txt):
+    return sum(abs(f.index(c) - i) for i, c in enumerate(sorted(set(txt), key=txt.count, reverse=True)) if c in f)
+
+def attack(ct, n=10):
+    return sorted([(k, decr(ct, k)) for k in range(26)], key=lambda x: score(x[1]))[:n]
+
+ct = "WTAAD LDGAS"
+for k, txt in attack(ct, 5):
+    print(f"Key {k}: {txt}")
